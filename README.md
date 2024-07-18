@@ -25,12 +25,6 @@
 
 
 
-#### 2 Agent planning
-
-agent planning：
-
-![](images/planning.png)
-
 
 
 
