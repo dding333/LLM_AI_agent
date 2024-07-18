@@ -12,7 +12,7 @@
 
 
 
-![](images/image_zTXpPhnOEE.png)
+![](images/planning.png)
 
 
 
