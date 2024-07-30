@@ -71,7 +71,7 @@ print(user_churn_test.info())
 if not os.path.exists('telco_data'):
     os.makedirs('telco_data')
 
-# 保存 DataFrame 为 CSV 文件
+# DataFrame to CSV
 # user_demographics_train.to_csv('telco_data/user_demographics_train.csv', index=False)
 # user_services_train.to_csv('telco_data/user_services_train.csv', index=False)
 # user_payments_train.to_csv('telco_data/user_payments_train.csv', index=False)
