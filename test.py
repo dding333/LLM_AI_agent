@@ -20,7 +20,7 @@ with open('DA instruct.md', 'r', encoding='utf-8') as f:
 #         model="gpt-4-0613",
 #         messages=[
 #             {"role": "system", "content": md_content},
-#             {"role": "user", "content": "user_demographics数据表的主键和user_services数据表的主键是否完全一致？"}
+#             {"role": "user", "content": "Do the primary keys of the user_demographics table match exactly with the primary keys of the user_services table?"}
 #         ],
 #         functions=functions,
 #         function_call="auto",
@@ -28,14 +28,14 @@ with open('DA instruct.md', 'r', encoding='utf-8') as f:
 # print(response["choices"][0]["message"])
 # messages = [
 #     {"role": "system", "content": md_content},
-#     {"role": "user", "content": "请问user_demographics数据表的主键和user_services数据表的主键是否完全一致？"}
+#     {"role": "user", "content": "Could you please confirm if the primary keys of the user_demographics table are identical to the primary keys of the user_services table?"}
 # ]
 # response1 = run_conversation(messages, functions_list=functions_list, model="gpt-4-0613", function_call="auto")
 # print(response1)
 
 # messages = [
 #     {"role": "system", "content": md_content},
-#     {"role": "user", "content": "请问user_demographics的第10条数据内容是？"}
+#     {"role": "user", "content": "What is the content of the 10th record in the user_demographics table?"}
 # ]
 #
 # response2=check_code_run(messages,
@@ -80,7 +80,7 @@ with open('DA instruct.md', 'r', encoding='utf-8') as f:
 # python_inter(py_code = code_str1, g=globals())
 # print(a)
 
-# msg1 = ChatMessages(system_content_list=[data_dictionary], question="请帮我查看user_demographics数据表中总共有多少条数据？")
+# msg1 = ChatMessages(system_content_list=[data_dictionary], question="Can you help me check how many records there are in the user_demographics table?")
 # msg2 = msg1.copy()
 # msg1_get_decomposition = add_task_decomposition_prompt(messages=msg1)
 # print(msg1_get_decomposition.history_messages)
@@ -91,33 +91,33 @@ with open('DA instruct.md', 'r', encoding='utf-8') as f:
 # msg2 = modify_prompt(messages=msg2_COT, action='remove', enable_md_output=False, enable_COT=True)
 # print(msg2.history_messages)
 af = AvailableFunctions(functions_list=[sql_inter, extract_data, python_inter, fig_inter])
-# msg1 = ChatMessages(system_content_list=[data_dictionary], question="请帮我简单介绍下telco_db数据库中的这四张表")
+# msg1 = ChatMessages(system_content_list=[data_dictionary], question="Could you provide a brief introduction to these four tables in the telco_db database?")
 # msg1_response = get_gpt_response(model='gpt-4-0613',
 #                                  messages=msg1,
 #                                  available_functions=None,
 #                                  is_developer_mode=False,
 #                                  is_enhanced_mode=False)
 # print(msg1_response.content)
-# msg2 = ChatMessages(system_content_list=[data_dictionary], question="请帮我查看user_demographics数据表中总共有多少条数据。")
+# msg2 = ChatMessages(system_content_list=[data_dictionary], question=""Please help me check how many records there are in the user_demographics table.")
 # msg2_response = get_gpt_response(model='gpt-4-0613',
 #                                  messages=msg2,
 #                                  available_functions=af,
 #                                  is_developer_mode=False,
 #                                  is_enhanced_mode=False)
 # print(msg2_response)
-# msg5 = ChatMessages(system_content_list=[data_dictionary], question="分析telco_db数据库中的这四张表，帮我梳理一个数据分析的基本思路")
+# msg5 = ChatMessages(system_content_list=[data_dictionary], question="Analyze these four tables in the telco_db database and help me outline a basic data analysis approach.")
 # msg5_response = get_gpt_response(model='gpt-4-0613',
 #                                  messages=msg5,
 #                                  available_functions=af,
 #                                  is_developer_mode=False,
 #                                  is_enhanced_mode=True)
 # print(msg5_response.content)
-# msg4 = ChatMessages(system_content_list=[data_dictionary], question="请帮我查询telco_db数据库中四张表数据量是否一致。")
+# msg4 = ChatMessages(system_content_list=[data_dictionary], question="Please help me check if the data volume is consistent across the four tables in the telco_db database.")
 # msg_response4 = get_chat_response(model='gpt-3.5-turbo-16k-0613',
 #                                   messages=msg4,
 #                                   available_functions=af)
 # print(msg_response4.history_messages)
-msg7 = ChatMessages(system_content_list=[data_dictionary], question="请帮我将user_demographics数据表读取到Python环境中，并对其进行缺失值分析。")
+msg7 = ChatMessages(system_content_list=[data_dictionary], question="Please help me load the user_demographics table into the Python environment and perform a missing value analysis.")
 msg_response7 = get_chat_response(model='gpt-3.5-turbo-16k-0613',
                                   messages=msg7,
                                   available_functions=af,
