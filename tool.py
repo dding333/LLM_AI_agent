@@ -17,31 +17,28 @@ import time
 
 def sql_inter(sql_query, g='globals()'):
     """
-    用于执行一段SQL代码，并最终获取SQL代码执行结果，\
-    核心功能是将输入的SQL代码传输至MySQL环境中进行运行，\
-    并最终返回SQL代码运行结果。需要注意的是，本函数是借助pymysql来连接MySQL数据库。
-    :param sql_query: 字符串形式的SQL查询语句，用于执行对MySQL中telco_db数据库中各张表进行查询，并获得各表中的各类相关信息
-    :param g: g，字符串形式变量，表示环境变量，无需设置，保持默认参数即可
-    :return：sql_query在MySQL中的运行结果。
+    This function is used to execute a segment of SQL code and ultimately retrieve the result of the SQL code execution. The core functionality is to transmit the input SQL code to a MySQL environment for execution and return the results. Note that this function uses pymysql to connect to the MySQL database.
+    sql_query: A string containing the SQL query to be executed. This query will be used to perform operations on tables within the telco_db database in MySQL and retrieve various related information from these tables.
+    g: A variable of type string, representing the environment variable. It does not need to be set; the default parameter is sufficient.
+    Returns: The result of executing sql_query in MySQL.
     """
 
     mysql_pw = os.getenv('MYSQL_PW')
 
     connection = pymysql.connect(
-            host='localhost',  # 数据库地址
-            user='root',  # 数据库用户名
-            passwd=mysql_pw,  # 数据库密码
-            db='telco_db',  # 数据库名
-            charset='utf8'  # 字符集选择utf8
+            host='localhost', 
+            user='root', 
+            passwd=mysql_pw, 
+            db='telco_db', 
+            charset='utf8'
         )
 
     try:
         with connection.cursor() as cursor:
-            # SQL查询语句
+
             sql = sql_query
             cursor.execute(sql)
 
-            # 获取查询结果
             results = cursor.fetchall()
 
     finally:
@@ -52,68 +49,72 @@ def sql_inter(sql_query, g='globals()'):
 
 def extract_data(sql_query,df_name,g='globals()'):
     """
-    借助pymysql将MySQL中的某张表读取并保存到本地Python环境中。
-    :param sql_query: 字符串形式的SQL查询语句，用于提取MySQL中的某张表。
-    :param df_name: 将MySQL数据库中提取的表格进行本地保存时的变量名，以字符串形式表示。
-    :param g: g，字符串形式变量，表示环境变量，无需设置，保持默认参数即可
-    :return：表格读取和保存结果
+    This function uses pymysql to read a table from MySQL and save it to the local Python environment.
+    sql_query: A string containing the SQL query used to extract a specific table from MySQL.
+    df_name: The variable name, in string format, under which the extracted table from the MySQL database will be saved locally.
+    g: A variable of type string, representing the environment variable. It does not need to be set; the default parameter is sufficient.
+    Returns: The result of reading and saving the table.
     """
 
     mysql_pw = os.getenv('MYSQL_PW')
 
     connection = pymysql.connect(
-            host='localhost',  # 数据库地址
-            user='root',  # 数据库用户名
-            passwd=mysql_pw,  # 数据库密码
-            db='telco_db',  # 数据库名
-            charset='utf8'  # 字符集选择utf8
+            host='localhost', 
+            user='root',
+            passwd=mysql_pw, 
+            db='telco_db', 
+            charset='utf8'
         )
 
 
     g[df_name] = pd.read_sql(sql_query, connection)
 
-    return "已成功完成%s变量创建" % df_name
+    return "Successfully completed the creation of the %s variable." % df_name
 
 def python_inter(py_code, g='globals()'):
     """
-    专门用于执行非绘图类python代码，并获取最终查询或处理结果。若是设计绘图操作的Python代码，则需要调用fig_inter函数来执行。
-    :param py_code: 字符串形式的Python代码，用于执行对telco_db数据库中各张数据表进行操作
-    :param g: g，字符串形式变量，表示环境变量，无需设置，保持默认参数即可
-    :return：代码运行的最终结果
+    Specifically used to execute non-plotting Python code and obtain the final query or processing result. For Python code related to designing plots, you should use the `fig_inter` function.
+    :param py_code: A string representing the Python code to be executed for operations on various data tables in the `telco_db` database.
+    :param g: `g`, a string variable representing the environment variable, which does not need to be set; keep the default parameter as is.
+    :return: The final result of the code execution.
     """
 
     global_vars_before = set(g.keys())
     try:
         exec(py_code, g)
     except Exception as e:
-        return f"代码执行时报错{e}"
+        return f"An error occurred during code execution: {e}"
+    
     global_vars_after = set(g.keys())
     new_vars = global_vars_after - global_vars_before
-    # 若存在新变量
+    
+    # If there are new variables
     if new_vars:
         result = {var: g[var] for var in new_vars}
         return str(result)
-    # 若不存在新变量，即有可能是代码是表达式，也有可能代码对相同变量重复赋值
+    
+    # If there are no new variables, which could mean the code is an expression or the code reassigns the same variables
     else:
         try:
-            # 尝试如果是表达式，则返回表达式运行结果
+            # Try returning the result if it is an expression
             return str(eval(py_code, g))
-        # 若报错，则先测试是否是对相同变量重复赋值
+        # If there is an error, test if it is due to reassigning the same variables
         except Exception as e:
             try:
                 exec(py_code, g)
-                return "已经顺利执行代码"
+                return "Code executed successfully"
             except Exception as e:
                 pass
-            # 若不是重复赋值，则报错
-            return f"代码执行时报错{e}"
+            # If it is not due to reassigning variables, return the error
+            return f"An error occurred during code execution: {e}"
+
 
 
 def upload_image_to_drive(figure, folder_id = '1YstWRU-78JwTEQQA3vJokK3OF_F0djRH'):
     """
-    将指定的fig对象上传至谷歌云盘
+    upload the fig to google drive
     """
-    folder_id = folder_id        # 此处需要改为自己的谷歌云盘文件夹ID
+    folder_id = folder_id       
     creds = Credentials.from_authorized_user_file('token.json')
     drive_service = build('drive', 'v3', credentials=creds)
 
@@ -138,60 +139,62 @@ def upload_image_to_drive(figure, folder_id = '1YstWRU-78JwTEQQA3vJokK3OF_F0djRH
 
 def fig_inter(py_code, fname, g='globals()'):
     """
-    用于执行一段包含可视化绘图的Python代码，并最终获取一个图片类型对象
-    :param py_code: 字符串形式的Python代码，用于根据需求进行绘图，代码中必须包含Figure对象创建过程
-    :param fname: py_code代码中创建的Figure变量名，以字符串形式表示。
-    :param g: g，字符串形式变量，表示环境变量，无需设置，保持默认参数即可
-    :return：代码运行的最终结果
+    Used to execute a segment of Python code that includes visualization and plotting, and ultimately obtain an image-type object.
+    :param py_code: A string containing Python code for creating plots as needed. The code must include the process of creating a Figure object.
+    :param fname: The variable name of the Figure created in the py_code, represented as a string.
+    :param g: g, a string variable representing the environment, which does not need to be set and can remain as the default parameter.
+    :return: The final result of executing the code.
+
     """
-    # 保存当前的后端
+
     current_backend = matplotlib.get_backend()
 
-    # 设置为Agg后端
+    # set agg backend 
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
     import pandas as pd
     import seaborn as sns
 
-    # 创建一个字典，用于存储本地变量
+    # create a python dict 
     local_vars = {"plt": plt, "pd": pd, "sns": sns}
 
     try:
         exec(py_code, g, local_vars)
     except Exception as e:
-        return f"代码执行时报错{e}"
+        return f"code excution with error{e}"
 
-    # 回复默认后端
+    # reply to backend
     matplotlib.use(current_backend)
 
-    # 根据图片名称，获取图片对象
+    # get the fig object
     fig = local_vars[fname]
 
-    # 上传图片
+    # upload fig 
     try:
         fig_url = upload_image_to_drive(fig)
-        res = f"已经成功运行代码，并已将代码创建的图片存储至：{fig_url}"
-
+        res = f"The code has been successfully executed, and the image created by the code has been stored at: {fig_url}"
+    
     except Exception as e:
-        res = "无法上传图片至谷歌云盘，请检查谷歌云盘文件夹ID，并检查当前网络情况"
+        res = "Unable to upload the image to Google Drive. Please check the Google Drive folder ID and the current network conditions."
+
 
     print(res)
     return res
 def auto_functions(functions_list):
     """
-    Chat模型的functions参数编写函数
-    :param functions_list: 包含一个或者多个函数对象的列表；
-    :return：满足Chat模型functions参数要求的functions对象
+    Function to create the functions parameter for the Chat model
+    :param functions_list: A list containing one or more function objects;
+    :return: A functions object that meets the requirements for the Chat model's functions parameter
     """
     def functions_generate(functions_list):
-        # 创建空列表，用于保存每个函数的描述字典
+        # Create an empty list to store the description dictionaries for each function
         functions = []
 
         def chen_ming_algorithm(data):
             """
-            陈明算法函数，该函数定义了一种特殊的数据集计算过程
-            :param data: 必要参数，表示带入计算的数据表，用字符串进行表示
-            :return：陈明函数计算后的结果，返回结果为表示为JSON格式的Dataframe类型对象
+            Chen Ming algorithm function, which defines a special dataset calculation process
+            :param data: Required parameter, represents the data table used for calculations, represented as a string
+            :return: The result of the Chen Ming function calculation, returned as a DataFrame object in JSON format
             """
             df_new = pd.read_json(data)
             res = np.sum(df_new, axis=1) - 1
@@ -201,38 +204,44 @@ def auto_functions(functions_list):
 
         chen_ming_function_name = chen_ming_algorithm.__name__
 
-        chen_ming_function = {"name": "chen_ming_algorithm",
-                              "description": "用于执行陈明算法的函数，定义了一种特殊的数据集计算过程",
-                              "parameters": {"type": "object",
-                                             "properties": {"data": {"type": "string",
-                                                                     "description": "执行陈明算法的数据集"},
-                                                           },
-                                             "required": ["data"],
-                                            },
-                             }
+        chen_ming_function = {
+            "name": "chen_ming_algorithm",
+            "description": "Function for executing the Chen Ming algorithm, which defines a special dataset calculation process",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "string",
+                        "description": "Dataset for executing the Chen Ming algorithm"
+                    },
+                },
+                "required": ["data"],
+            },
+        }
 
 
-        # 对每个外部函数进行循环
+
+
         for function in functions_list:
-            # 读取函数对象的函数说明
+            # read the documents of a function 
             function_description = inspect.getdoc(function)
-            # 读取函数的函数名字符串
             function_name = function.__name__
-
-            user_message1 = '以下是某的函数说明：%s。' % chen_ming_function_description +\
-                            '根据这个函数的函数说明，请帮我创建一个function对象，用于描述这个函数的基本情况。这个function对象是一个JSON格式的字典，\
-                            这个字典有如下5点要求：\
-                            1.字典总共有三个键值对；\
-                            2.第一个键值对的Key是字符串name，value是该函数的名字：%s，也是字符串；\
-                            3.第二个键值对的Key是字符串description，value是该函数的函数的功能说明，也是字符串；\
-                            4.第三个键值对的Key是字符串parameters，value是一个JSON Schema对象，用于说明该函数的参数输入规范。\
-                            5.输出结果必须是一个JSON格式的字典，只输出这个字典即可，前后不需要任何前后修饰或说明的语句' % chen_ming_function_name
+            
+            # comment out the user_message before using
+            # user_message1 = 'Here is the description of a function: %s.' % chen_ming_function_description
+            #                 "Based on this function description, please help me create a function object to describe the basic details of this function. This function object should be a JSON-formatted dictionary with the following 5 requirements:\
+            #                 1. The dictionary should contain three key-value pairs;\
+            #                 2. The first key-value pair should have the key "name" with the value being the function name: %s, which should also be a string;\
+            #                 3. The second key-value pair should have the key "description" with the value being the function's functionality description, which should also be a string;\
+            #                 4. The third key-value pair should have the key "parameters" with the value being a JSON Schema object that describes the function's parameter input specifications;\
+            #                 5. The output must be a JSON-formatted dictionary, and only this dictionary should be output, without any additional statements or explanations." % chen_ming_function_name
 
 
             assistant_message1 = json.dumps(chen_ming_function)
+            
+            user_prompt = 'Now there is another function, with the function name: %s; and the function description: %s;\
+                          Please help me create a function object for this current function in a similar format.' % (function_name, function_description)
 
-            user_prompt = '现在有另一个函数，函数名为：%s；函数说明为：%s；\
-                          请帮我仿造类似的格式为当前函数创建一个function对象。' % (function_name, function_description)
 
             response = openai.ChatCompletion.create(
                               model="gpt-4-0613",
@@ -246,23 +255,24 @@ def auto_functions(functions_list):
 
     max_attempts = 3
     attempts = 0
-
+    
     while attempts < max_attempts:
         try:
             functions = functions_generate(functions_list)
-            break  # 如果代码成功执行，跳出循环
+            break  # Exit the loop if the code executes successfully
         except Exception as e:
-            attempts += 1  # 增加尝试次数
-            print("发生错误：", e)
-            print("由于模型limit rate导致报错，即将暂停1分钟，1分钟后重新尝试调用模型")
+            attempts += 1  # Increment the attempt count
+            print("An error occurred:", e)
+            print("Due to a model limit rate error, pausing for 1 minute. The model will be retried after 1 minute.")
             time.sleep(60)
-
+    
             if attempts == max_attempts:
-                print("已达到最大尝试次数，程序终止。")
-                raise  # 重新引发最后一个异常
+                print("Maximum number of attempts reached, terminating the program.")
+                raise  # Re-raise the last exception
             else:
-                print("正在重新运行...")
+                print("Retrying...")
     return functions
+
 
 
 if __name__ == '__main__':
