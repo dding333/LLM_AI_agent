@@ -1,50 +1,47 @@
 def add_task_decomposition_prompt(messages):
     """
-    当开启增强模式时，任何问题首次尝试作答时都会调用本函数，创建一个包含任务拆解Few-shot的新的message。
-    :param model: 必要参数，表示调用的大模型名称
-    :param messages: 必要参数，ChatMessages类型对象，用于存储对话消息
-    :param available_functions: 可选参数，AvailableFunctions类型对象，用于表示开启对话时外部函数基本情况。\
-    默认值为None，表示不存在外部函数。
-    :return: task_decomp_few_shot，一个包含任务拆解Few-shot提示示例的message
+    When enhanced mode is enabled, this function is called during the first attempt to answer any question, creating a new message containing task decomposition Few-shot examples.
+    :param messages: Required parameter, a ChatMessages type object used to store conversation messages.
+    :return: task_decomp_few_shot, a message containing task decomposition Few-shot prompt examples.
     """
 
-    # 任务拆解Few-shot
-    # 第一个提示示例
-    user_question1 = '请问谷歌云邮箱是什么？'
-    user_message1_content = "现有用户问题如下：“%s”。为了回答这个问题，总共需要分几步来执行呢？\
-    若无需拆分执行步骤，请直接回答原始问题。" % user_question1
-    assistant_message1_content = '谷歌云邮箱是指Google Workspace（原G Suite）中的Gmail服务，\
-    它是一个安全、智能、易用的电子邮箱，有15GB的免费存储空间，可以直接在电子邮件中接收和存储邮件。\
-    Gmail 邮箱会自动过滤垃圾邮件和病毒邮件，并且可以通过电脑或手机等移动设备在任何地方查阅邮件。\
-    您可以使用搜索和标签功能来组织邮件，使邮件处理更为高效。'
+    # Task decomposition Few-shot
+    # First prompt example
+    user_question1 = 'What is Google Cloud Email?'
+    user_message1_content = "The existing user question is: “%s”. How many steps are needed to answer this question?\
+    If no decomposition is required, please directly answer the original question." % user_question1
+    assistant_message1_content = 'Google Cloud Email refers to the Gmail service within Google Workspace (formerly G Suite).\
+    It is a secure, intelligent, and user-friendly email service with 15GB of free storage, allowing you to receive and store emails directly.\
+    Gmail automatically filters spam and virus emails and can be accessed from any location via computer or mobile devices.\
+    You can use search and labeling features to organize emails and make email handling more efficient.'
 
-    # 第二个提示示例
-    user_question2 = '请帮我介绍下OpenAI。'
-    user_message2_content = "现有用户问题如下：“%s”。为了回答这个问题，总共需要分几步来执行呢？\
-    若无需拆分执行步骤，请直接回答原始问题。" % user_question2
-    assistant_message2_content = 'OpenAI是一家开发和应用友好人工智能的公司，\
-    它的目标是确保人工通用智能（AGI）对所有人都有益，以及随着AGI部署，尽可能多的人都能受益。\
-    OpenAI致力在商业利益和人类福祉之间做出正确的平衡，本质上是一家人道主义公司。\
-    OpenAI开发了诸如GPT-3这样的先进模型，在自然语言处理等诸多领域表现出色。'
+    # Second prompt example
+    user_question2 = 'Please introduce OpenAI.'
+    user_message2_content = "The existing user question is: “%s”. How many steps are needed to answer this question?\
+    If no decomposition is required, please directly answer the original question." % user_question2
+    assistant_message2_content = 'OpenAI is a company that develops and applies friendly artificial intelligence.\
+    Its goal is to ensure that artificial general intelligence (AGI) benefits everyone and to maximize benefits as AGI is deployed.\
+    OpenAI aims to balance commercial interests with human welfare and is essentially a humanitarian company.\
+    OpenAI has developed advanced models like GPT-3, which perform exceptionally well in natural language processing and other fields.'
 
-    # 第三个提示示例
-    user_question3 = '围绕数据库中的user_payments表，我想要检查该表是否存在缺失值'
-    user_message3_content = "现有用户问题如下：“%s”。为了回答这个问题，总共需要分几步来执行呢？\
-    若无需拆分执行步骤，请直接回答原始问题。" % user_question3
-    assistant_message3_content = '为了检查user_payments数据集是否存在缺失值，我们将执行如下步骤：\
-    \n\n步骤1：使用`extract_data`函数将user_payments数据表读取到当前的Python环境中。\
-    \n\n步骤2：使用`python_inter`函数执行Python代码检查数据集的缺失值。'
+    # Third prompt example
+    user_question3 = 'I want to check if there are missing values in the user_payments table in the database.'
+    user_message3_content = "The existing user question is: “%s”. How many steps are needed to answer this question?\
+    If no decomposition is required, please directly answer the original question." % user_question3
+    assistant_message3_content = 'To check if there are missing values in the user_payments dataset, we will perform the following steps:\
+    \n\nStep 1: Use the `extract_data` function to load the user_payments table into the current Python environment.\
+    \n\nStep 2: Use the `python_inter` function to execute Python code to check for missing values in the dataset.'
 
-    # 第四个提示示例
-    user_question4 = '我想寻找合适的缺失值填补方法，来填补user_payments数据集中的缺失值。'
-    user_message4_content = "现有用户问题如下：“%s”。为了回答这个问题，总共需要分几步来执行呢？\
-    若无需拆分执行步骤，请直接回答原始问题。" % user_question4
-    assistant_message4_content = '为了找到合适的缺失值填充方法，我们需要执行以下三步：\
-    \n\n步骤1：分析user_payments数据集中的缺失值情况。通过查看各字段的缺失率和观察缺失值分布，了解其缺失幅度和模式。\
-    \n\n步骤2：确定值填补策略。基于观察结果和特定字段的性质确定恰当的填补策略，例如使用众数、中位数、均值或建立模型进行填补等。\
-    \n\n步骤3：进行缺失值填补。根据确定的填补策略，执行填补操作，然后验证填补效果。'
+    # Fourth prompt example
+    user_question4 = 'I want to find a suitable method for imputing missing values in the user_payments dataset.'
+    user_message4_content = "The existing user question is: “%s”. How many steps are needed to answer this question?\
+    If no decomposition is required, please directly answer the original question." % user_question4
+    assistant_message4_content = 'To find a suitable method for imputing missing values, we need to perform the following three steps:\
+    \n\nStep 1: Analyze the missing values in the user_payments dataset. By checking the missing rates for each field and observing the distribution of missing values, understand the extent and pattern of missing data.\
+    \n\nStep 2: Determine the imputation strategy. Based on the observations and the nature of specific fields, determine an appropriate imputation strategy, such as using mode, median, mean, or building a model for imputation.\
+    \n\nStep 3: Perform the imputation. Execute the imputation according to the chosen strategy and verify the imputation results.'
 
-    # 在保留原始问题的情况下加入Few-shot
+    # Add Few-shot examples while preserving the original question
     task_decomp_few_shot = messages.copy()
     task_decomp_few_shot.messages_pop(manual=True, index=-1)
     task_decomp_few_shot.messages_append({"role": "user", "content": user_message1_content})
@@ -58,8 +55,8 @@ def add_task_decomposition_prompt(messages):
 
     user_question = messages.history_messages[-1]["content"]
 
-    new_question = "现有用户问题如下：“%s”。为了回答这个问题，总共需要分几步来执行呢？\
-    若无需拆分执行步骤，请直接回答原始问题。" % user_question
+    new_question = "The existing user question is: “%s”. How many steps are needed to answer this question?\
+    If no decomposition is required, please directly answer the original question." % user_question
     question_message = messages.history_messages[-1].copy()
     question_message["content"] = new_question
     task_decomp_few_shot.messages_append(question_message)
@@ -69,21 +66,21 @@ def add_task_decomposition_prompt(messages):
 
 def modify_prompt(messages, action='add', enable_md_output=True, enable_COT=True):
     """
-    当开启开发者模式时，会让用户选择是否添加COT提示模板或其他提示模板，并创建一个经过修改的新的message。
-    :param messages: 必要参数，ChatMessages类型对象，用于存储对话消息
-    :param action: 'add' 或 'remove'，决定是添加还是移除提示
-    :param enable_md_output: 是否启用 markdown 格式输出
-    :param enable_COT: 是否启用 COT 提示
-    :return: messages，一个经过提示词修改的message
+    When developer mode is enabled, users can choose whether to add or remove COT prompts or other prompts, and create a new message with modifications.
+    :param messages: Required parameter, a ChatMessages type object used to store conversation messages.
+    :param action: 'add' or 'remove', determines whether to add or remove prompts.
+    :param enable_md_output: Whether to enable markdown format output.
+    :param enable_COT: Whether to enable COT prompts.
+    :return: messages, a message with prompt modifications.
     """
 
-    # 思考链提示词模板
-    cot_prompt = "请一步步思考并得出结论。"
+    # Chain of Thought (COT) prompt template
+    cot_prompt = "Please think step by step and draw a conclusion."
 
-    # 输出markdown提示词模板
-    md_prompt = "任何回答都请以markdown格式进行输出。"
+    # Markdown output prompt template
+    md_prompt = "Please format all responses in markdown."
 
-    # 如果是添加提示词
+    # If adding prompts
     if action == 'add':
         if enable_COT:
             messages.messages[-1]["content"] += cot_prompt
@@ -93,7 +90,7 @@ def modify_prompt(messages, action='add', enable_md_output=True, enable_COT=True
             messages.messages[-1]["content"] += md_prompt
             messages.history_messages[-1]["content"] += md_prompt
 
-    # 如果是将指定提示词删除
+    # If removing specified prompts
     elif action == 'remove':
         if enable_md_output:
             messages.messages[-1]["content"] = messages.messages[-1]["content"].replace(md_prompt, "")
@@ -104,6 +101,7 @@ def modify_prompt(messages, action='add', enable_md_output=True, enable_COT=True
             messages.history_messages[-1]["content"] = messages.history_messages[-1]["content"].replace(cot_prompt, "")
 
     return messages
+
 
 if __name__ == '__main__':
     print("this file is the planning module")
