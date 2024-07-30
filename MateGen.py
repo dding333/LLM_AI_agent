@@ -14,15 +14,15 @@ class MateGen():
                  is_enhanced_mode=False,
                  is_developer_mode=False):
         """
-        初始参数解释：
-        api_key：必选参数，表示调用OpenAI模型所必须的字符串密钥，没有默认取值，需要用户提前设置才可使用MateGen；
-        model：可选参数，表示当前选择的Chat模型类型，默认为gpt-3.5-turbo-0613，具体当前OpenAI账户可以调用哪些模型，可以参考官网Limit链接：https://platform.openai.com/account/limits ；
-        system_content_list：可选参数，表示输入的系统消息或者外部文档，默认为空列表，表示不输入外部文档；
-        project：可选参数，表示当前对话所归属的项目名称，需要输入InterProject类对象，用于表示当前对话的本地存储方法，默认为None，表示不进行本地保存；
-        messages：可选参数，表示当前对话所继承的Messages，需要是ChatMessages对象、或者是字典所构成的list，默认为None，表示不继承Messages；
-        available_functions：可选参数，表示当前对话的外部工具，需要是AvailableFunction对象，默认为None，表示当前对话没有外部函数；
-        is_enhanced_mode：可选参数，表示当前对话是否开启增强模式，增强模式下会自动开启复杂任务拆解流程以及深度debug功能，会需要耗费更多的计算时间和金额，不过会换来Agent整体性能提升，默认为False；
-        is_developer_mode：可选参数，表示当前对话是否开启开发者模式，在开发者模式下，模型会先和用户确认文本或者代码是否正确，再选择是否进行保存或者执行，对于开发者来说借助开发者模式可以极大程度提升模型可用性，但并不推荐新人使用，默认为False；
+        'api_key': Required parameter, representing the string key necessary to call the OpenAI model. There is no default value; users must set this before using MateGen.
+        'model': Optional parameter, representing the type of Chat model currently selected. The default is gpt-3.5-turbo-0613. For information on which models are available for the current OpenAI account, refer to the official limit link: OpenAI Account Limits.
+        'system_content_list': Optional parameter, representing the input system messages or external documents. The default is an empty list, indicating no external documents are input.
+        'project': Optional parameter, representing the project name to which the current conversation belongs. This requires an InterProject class object to indicate the local storage method of the current conversation. The default is None, meaning no local storage.
+        'messages': Optional parameter, representing the Messages inherited by the current conversation. This needs to be a ChatMessages object or a list composed of dictionaries. The default is None, meaning no Messages are inherited.
+        'available_functions': Optional parameter, representing external tools for the current conversation. This needs to be an AvailableFunction object. The default is None, indicating no external functions are available for the current conversation.
+        'is_enhanced_mode': Optional parameter, indicating whether the current conversation is in enhanced mode. Enhanced mode will automatically enable complex task decomposition processes and deep debugging functions, which will require more computation time and cost but will improve overall Agent performance. 
+        'is_developer_mode': Optional parameter, indicating whether the current conversation is in developer mode. In developer mode, the model will first confirm with the user whether the text or code is correct before choosing to save or execute it. 
+         This can greatly enhance model usability for developers, but it is not recommended for beginners. The default is False.
         """
 
         self.api_key = api_key
@@ -31,7 +31,7 @@ class MateGen():
         self.system_content_list = system_content_list
         tokens_thr = None
 
-        # 计算tokens_thr
+        # calculate tokens_thr
         if '1106' in model:
             tokens_thr = 110000
         elif '16k' in model:
@@ -43,11 +43,11 @@ class MateGen():
 
         self.tokens_thr = tokens_thr
 
-        # 创建self.messages属性
+        # create self.messages
         self.messages = ChatMessages(system_content_list=system_content_list,
                                      tokens_thr=tokens_thr)
 
-        # 若初始参数messages不为None，则将其加入self.messages中
+        # if the initial messages is not none, add it to the self.messages
         if messages != None:
             self.messages.messages_append(messages)
 
@@ -57,8 +57,8 @@ class MateGen():
 
     def chat(self, question=None):
         """
-        MateGen类主方法，支持单次对话和多轮对话两种模式，当用户没有输入question时开启多轮对话，反之则开启单轮对话。\
-        无论开启单论对话或多轮对话，对话结果将会保存在self.messages中，便于下次调用
+        The MateGen class's main method supports both single-round and multi-round conversation modes. When the user does not input a question, multi-round conversation mode is enabled; otherwise, single-round conversation mode is activated. 
+        Regardless of whether single-round or multi-round conversation mode is enabled, the conversation results will be saved in self.messages, making it convenient for future use.
         """
         head_str = "▌ Model set to %s" % self.model
         display(Markdown(head_str))
@@ -79,24 +79,24 @@ class MateGen():
                                                   is_developer_mode=self.is_developer_mode,
                                                   is_enhanced_mode=self.is_enhanced_mode)
 
-                user_input = input("您还有其他问题吗？(输入退出以结束对话): ")
-                if user_input == "退出":
+                user_input = input(" Do you have any other questions? (Enter 'exit' to end the conversation) ")
+                if user_input == "exit":
                     break
                 else:
                     self.messages.messages_append({"role": "user", "content": user_input})
 
     def reset(self):
         """
-        重置当前MateGen对象的messages
+        reset the messages
         """
         self.messages = ChatMessages(system_content_list=self.system_content_list)
 
     def upload_messages(self):
         """
-        将当前messages上传至project项目中
+        upload the current messages to project file 
         """
         if self.project == None:
-            print("需要先输入project参数（需要是一个InterProject对象），才可上传messages")
+            print("You need to first input the project parameter (which needs to be an InterProject object) before uploading messages.")
             return None
         else:
             self.project.append_doc_content(content=self.messages.history_messages)
