@@ -41,9 +41,9 @@ The interaction method of the code interpreter itself must be very convenient: L
 
 ![](image/agent.png)
 
-
-
 #### 2.2 dataset
+
+![](image/dataset.png)
 
 
 
