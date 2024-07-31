@@ -42,8 +42,18 @@ The interaction method of the code interpreter itself must be very convenient: L
 ![](image/agent.png)
 
 #### 2.2 dataset
+https://www.kaggle.com/datasets/blastchar/telco-customer-churn
+![](image/traindata.png)
 
-![](image/dataset.png)
+
+### 3 、Run
+run create_train_test_sets.py to creat dataset and then upload those datasets to mysql
+
+
+run test.py to see responses
+
+
+
 
 
 
